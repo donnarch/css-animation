@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DUDU Animation</title>
+    <style>
+      body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #ff0000; /* Red background */
+        transition: background-color 0.5s ease;
+        overflow: hidden;
+        cursor: pointer;
+      }
+
+      .dudu-container {
+        position: relative;
+        text-align: center;
+      }
+
+      .dudu-text {
+        font-family: "Arial", sans-serif;
+        font-size: 8rem;
+        font-weight: bold;
+        color: black;
+        text-shadow: 0 0 20px rgba(255, 255, 255, 0.7);
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 2;
+      }
+
+      .dudu-text:hover {
+        transform: scale(1.2);
+        text-shadow: 0 0 30px rgba(255, 255, 255, 0.9);
+      }
+
+      .glow-effect {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 0.8) 0%,
+          rgba(255, 0, 0, 0) 70%
+        );
+        opacity: 0;
+        transition: all 0.5s ease;
+        z-index: 1;
+      }
+
+      .dudu-container:hover .glow-effect {
+        width: 300px;
+        height: 300px;
+        opacity: 0.6;
+      }
+
+      /* Floating particles */
+      .particle {
+        position: absolute;
+        background-color: rgba(255, 255, 255, 0.7);
+        border-radius: 50%;
+        pointer-events: none;
+        animation: float 15s linear infinite;
+      }
+
+      @keyframes float {
+        0% {
+          transform: translateY(0) translateX(0);
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        90% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-100vh) translateX(20px);
+          opacity: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="dudu-container">
+      <div class="glow-effect"></div>
+      <div class="dudu-text">DUDU</div>
+    </div>
+
+    <script>
+      // Create floating particles
+      function createParticles() {
+        const particleCount = 30;
+        for (let i = 0; i < particleCount; i++) {
+          const particle = document.createElement("div");
+          particle.classList.add("particle");
+
+          // Random properties
+          const size = Math.random() * 10 + 2;
+          const delay = Math.random() * 15;
+          const duration = 10 + Math.random() * 10;
+          const left = Math.random() * 100;
+
+          Object.assign(particle.style, {
+            width: `${size}px`,
+            height: `${size}px`,
+            left: `${left}vw`,
+            bottom: "0",
+            animationDelay: `${delay}s`,
+            animationDuration: `${duration}s`,
+          });
+
+          document.body.appendChild(particle);
+        }
+      }
+
+      window.onload = createParticles;
+    </script>
+  </body>
+</html>

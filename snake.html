@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Snake Game</title>
+    <link rel="stylesheet" href="./snake.css" />
+  </head>
+  <body>
+    <div id="start-screen">
+      <h1>Snake Game</h1>
+      <button onclick="startGame(guy)">Start Game</button>
+    </div>
+
+    <div id="score">Score: 0</div>
+    <canvas id="game" width="400" height="400"></canvas>
+
+    <div class="controls" id="mobile-controls">
+      <button class="btn" onclick="setDirection(0, -1)">↑</button><br />
+      <button class="btn" onclick="setDirection(-1, 0)">←</button>
+      <button class="btn" onclick="setDirection(1, 0)">→</button><br />
+      <button class="btn" onclick="setDirection(0, 1)">↓</button>
+    </div>
+
+    <div id="game-over-screen">
+      <h2>Game Over!</h2>
+      <p id="final-score"></p>
+      <button onclick="startGame()">Restart</button>
+    </div>
+
+    <audio
+      id="eat-sound"
+      src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"
+    ></audio>
+    <audio
+      id="game-over-sound"
+      src="https://actions.google.com/sounds/v1/cartoon/concussive_hit_guitar_boing.ogg"
+    ></audio>
+
+    <script src="./script.js"></script>
+  </body>
+</html>

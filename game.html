@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AISHA: Star Collector</title>
+    <style>
+      /* Cosmic Game World */
+      body {
+        margin: 0;
+        height: 100vh;
+        overflow: hidden;
+        background: radial-gradient(circle at center, #1a0033, #000);
+        font-family: "Arial", sans-serif;
+        cursor: none;
+      }
+
+      /* Game Container */
+      .game-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+      }
+
+      /* Player ( Text) */
+      .player {
+        position: absolute;
+        font-size: 3rem;
+        font-weight: bold;
+        color: #ff66b2;
+        text-shadow: 0 0 15px #ff0066, 0 0 30px #ff0066;
+        user-select: none;
+        transform: translate(-50%, -50%);
+        z-index: 10;
+        transition: transform 0.1s ease-out;
+      }
+
+      /* Falling Stars */
+      .star {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23FFFF00" d="M12 2L15 9H22L16 14L19 21L12 17L5 21L8 14L2 9H9L12 2Z"/></svg>')
+          no-repeat center;
+        background-size: contain;
+        animation: twinkle 1s infinite alternate;
+      }
+
+      @keyframes twinkle {
+        0% {
+          opacity: 0.7;
+          transform: scale(0.9);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1.1);
+        }
+      }
+
+      /* Score Display */
+      .score {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        color: white;
+        font-size: 2rem;
+        text-shadow: 0 0 10px #00ffff;
+        z-index: 100;
+      }
+
+      /* Game Over Screen */
+      .game-over {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        color: #ff66b2;
+        font-size: 3rem;
+        text-shadow: 0 0 15px #ff0066;
+      }
+
+      .restart-btn {
+        margin-top: 20px;
+        padding: 10px 30px;
+        background: linear-gradient(45deg, #ff0066, #ff66b2);
+        border: none;
+        border-radius: 50px;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+        transition: transform 0.3s;
+      }
+
+      .restart-btn:hover {
+        transform: scale(1.1);
+      }
+
+      /* Cosmic Particles */
+      .particle {
+        position: absolute;
+        border-radius: 50%;
+        background: white;
+        opacity: 0;
+        animation: float linear infinite;
+      }
+
+      @keyframes float {
+        to {
+          transform: translateY(-100vh);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="game-container">
+      <div class="player">DONI</div>
+      <div class="score">0</div>
+      <div class="game-over">
+        Game Over!<br />
+        <span class="final-score">Score: 0</span>
+        <button class="restart-btn">Play Again</button>
+      </div>
+    </div>
+
+    <script>
+      // Game Elements
+      const player = document.querySelector(".player");
+      const gameContainer = document.querySelector(".game-container");
+      const scoreDisplay = document.querySelector(".score");
+      const gameOverScreen = document.querySelector(".game-over");
+      const finalScoreDisplay = document.querySelector(".final-score");
+
+      // Game Variables
+      let score = 0;
+      let gameActive = true;
+      let playerX = 50;
+      let playerY = 80;
+
+      // Initialize Player Position
+      function updatePlayerPosition() {
+        player.style.left = `${playerX}%`;
+        player.style.top = `${playerY}%`;
+      }
+      updatePlayerPosition();
+
+      // Mouse Movement Controls
+      document.addEventListener("mousemove", (e) => {
+        if (!gameActive) return;
+
+        playerX = (e.clientX / window.innerWidth) * 100;
+        playerY = (e.clientY / window.innerHeight) * 100;
+        updatePlayerPosition();
+      });
+
+      // Touch Controls for Mobile
+      document.addEventListener("touchmove", (e) => {
+        if (!gameActive) return;
+        e.preventDefault();
+
+        const touch = e.touches[0];
+        playerX = (touch.clientX / window.innerWidth) * 100;
+        playerY = (touch.clientY / window.innerHeight) * 100;
+        updatePlayerPosition();
+      });
+
+      // Create Stars
+      function createStar() {
+        if (!gameActive) return;
+
+        const star = document.createElement("div");
+        star.classList.add("star");
+
+        const xPos = Math.random() * 90 + 5;
+        const size = Math.random() * 20 + 10;
+        const speed = Math.random() * 3 + 2;
+
+        star.style.left = `${xPos}%`;
+        star.style.width = `${size}px`;
+        star.style.height = `${size}px`;
+
+        gameContainer.appendChild(star);
+
+        let yPos = 0;
+        const fallInterval = setInterval(() => {
+          if (!gameActive) {
+            clearInterval(fallInterval);
+            return;
+          }
+
+          yPos += speed;
+          star.style.top = `${yPos}px`;
+
+          // Check collision with player
+          if (
+            yPos > (playerY * window.innerHeight) / 100 - 50 &&
+            yPos < (playerY * window.innerHeight) / 100 + 50 &&
+            parseFloat(star.style.left) > playerX - 10 &&
+            parseFloat(star.style.left) < playerX + 10
+          ) {
+            // Collected star!
+            score++;
+            scoreDisplay.textContent = score;
+            star.remove();
+            clearInterval(fallInterval);
+            createParticles(parseFloat(star.style.left), yPos);
+            playCollectSound();
+          }
+
+          // Star fell to bottom
+          if (yPos > window.innerHeight) {
+            star.remove();
+            clearInterval(fallInterval);
+            endGame();
+          }
+        }, 20);
+      }
+
+      // Create Sparkle Particles
+      function createParticles(x, y) {
+        for (let i = 0; i < 20; i++) {
+          const particle = document.createElement("div");
+          particle.classList.add("particle");
+
+          const size = Math.random() * 5 + 2;
+          const duration = Math.random() * 1 + 0.5;
+
+          particle.style.left = `${x}px`;
+          particle.style.top = `${y}px`;
+          particle.style.width = `${size}px`;
+          particle.style.height = `${size}px`;
+          particle.style.animationDuration = `${duration}s`;
+          particle.style.opacity = Math.random() * 0.7 + 0.3;
+
+          gameContainer.appendChild(particle);
+
+          // Remove particle after animation
+          setTimeout(() => particle.remove(), duration * 1000);
+        }
+      }
+
+      // Background Particles
+      function createBackgroundParticles() {
+        for (let i = 0; i < 30; i++) {
+          const particle = document.createElement("div");
+          particle.classList.add("particle");
+
+          const size = Math.random() * 3 + 1;
+          const duration = Math.random() * 10 + 5;
+          const delay = Math.random() * 10;
+          const xPos = Math.random() * 100;
+
+          particle.style.left = `${xPos}vw`;
+          particle.style.bottom = "0";
+          particle.style.width = `${size}px`;
+          particle.style.height = `${size}px`;
+          particle.style.animationDuration = `${duration}s`;
+          particle.style.animationDelay = `${delay}s`;
+          particle.style.opacity = Math.random() * 0.3 + 0.1;
+
+          gameContainer.appendChild(particle);
+        }
+      }
+
+      // End Game
+      function endGame() {
+        gameActive = false;
+        finalScoreDisplay.textContent = `Score: ${score}`;
+        gameOverScreen.style.display = "flex";
+      }
+
+      // Restart Game
+      document.querySelector(".restart-btn").addEventListener("click", () => {
+        // Clear all stars
+        document.querySelectorAll(".star").forEach((star) => star.remove());
+
+        // Reset game state
+        score = 0;
+        scoreDisplay.textContent = "0";
+        gameActive = true;
+        gameOverScreen.style.display = "none";
+
+        // Start new game
+        startGame();
+      });
+
+      // Sound Effects
+      function playCollectSound() {
+        const sound = new Audio();
+        sound.src =
+          "data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU..."; // Short base64 encoded sound
+        sound.volume = 0.2;
+        sound.play().catch((e) => console.log("Sound playback prevented"));
+      }
+
+      // Start Game
+      function startGame() {
+        createBackgroundParticles();
+        setInterval(createStar, 800); // Create new star every 800ms
+      }
+
+      // Initialize Game
+      startGame();
+    </script>
+  </body>
+</html>

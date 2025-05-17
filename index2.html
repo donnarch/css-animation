@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./style2.css">
+    <title>Enchanted Lamp</title>
+  </head>
+  <body>
+    <div class="lamp-container">
+      <div class="light-beam"></div>
+      <div class="lamp">
+        <div class="lamp-liquid"></div>
+      </div>
+    </div>
+
+    <script>
+      // Create floating particles
+      function createParticles() {
+        const colors = ["#ff9999", "#99ff99", "#9999ff", "#ffff99", "#ff99ff"];
+        for (let i = 0; i < 50; i++) {
+          const particle = document.createElement("div");
+          particle.classList.add("particle");
+
+          // Random properties
+          const size = Math.random() * 5 + 2;
+          const duration = Math.random() * 10 + 5;
+          const delay = Math.random() * 10;
+          const color = colors[Math.floor(Math.random() * colors.length)];
+
+          // Apply styles
+          Object.assign(particle.style, {
+            width: `${size}px`,
+            height: `${size}px`,
+            background: color,
+            left: `${Math.random() * 100}vw`,
+            bottom: "-100px",
+            opacity: Math.random() * 0.5 + 0.1,
+            animationDuration: `${duration}s`,
+            animationDelay: `${delay}s`,
+          });
+
+          document.body.appendChild(particle);
+        }
+      }
+
+      // Initialize
+      window.onload = createParticles;
+    </script>
+  </body>
+</html>
